@@ -1,0 +1,7 @@
+name,category,price,quantity,status
+Laptop,Electronics,55000,10,active
+Mouse,Electronics,800,50,active
+Keyboard,Electronics,1500,25,active
+Office Chair,Furniture,4500,15,active
+Desk,Furniture,7000,8,active
+Monitor,Electronics,12000,12,inactive
