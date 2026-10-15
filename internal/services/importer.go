@@ -25,7 +25,6 @@ func ProcessCSV(filePath string, jobID string) {
 
 	result := ImportResult{}
 
-	// Open CSV file
 	file, err := os.Open(filePath)
 	if err != nil {
 		updateJobFailed(jobID, err.Error())
@@ -35,7 +34,6 @@ func ProcessCSV(filePath string, jobID string) {
 
 	reader := csv.NewReader(file)
 
-	// Read header
 	header, err := reader.Read()
 	if err != nil {
 		updateJobFailed(jobID, "Unable to read CSV header")
@@ -44,7 +42,6 @@ func ProcessCSV(filePath string, jobID string) {
 
 	fmt.Println("CSV Header:", header)
 
-	// Process every row
 	for {
 		row, err := reader.Read()
 
@@ -63,7 +60,6 @@ func ProcessCSV(filePath string, jobID string) {
 
 		result.TotalRows++
 
-		// Validate row
 		product, validationError := validateProductRow(row)
 
 		if validationError != nil {
@@ -75,7 +71,6 @@ func ProcessCSV(filePath string, jobID string) {
 			continue
 		}
 
-		// Insert valid product
 		err = database.DB.Create(&product).Error
 
 		if err != nil {
@@ -90,7 +85,6 @@ func ProcessCSV(filePath string, jobID string) {
 		result.SuccessRows++
 	}
 
-	// Update job
 	now := time.Now()
 
 	status := "completed"
@@ -121,7 +115,6 @@ func ProcessExcel(filePath string, jobID string) {
 
 	result := ImportResult{}
 
-	// Open Excel file
 	file, err := excelize.OpenFile(filePath)
 	if err != nil {
 		updateJobFailed(jobID, err.Error())
@@ -129,7 +122,6 @@ func ProcessExcel(filePath string, jobID string) {
 	}
 	defer file.Close()
 
-	// Get first sheet
 	sheetName := file.GetSheetName(0)
 
 	rows, err := file.GetRows(sheetName)
@@ -143,10 +135,8 @@ func ProcessExcel(filePath string, jobID string) {
 		return
 	}
 
-	// First row is the header
 	fmt.Println("Excel Header:", rows[0])
 
-	// Process remaining rows
 	for i, row := range rows[1:] {
 
 		result.TotalRows++
@@ -168,7 +158,6 @@ func ProcessExcel(filePath string, jobID string) {
 			continue
 		}
 
-		// Insert valid product
 		err = database.DB.Create(&product).Error
 
 		if err != nil {
@@ -189,7 +178,6 @@ func ProcessExcel(filePath string, jobID string) {
 		result.SuccessRows++
 	}
 
-	// Update import job
 	now := time.Now()
 
 	status := "completed"
@@ -232,31 +220,26 @@ func validateProductRow(row []string) (models.Product, error) {
 	quantityString := strings.TrimSpace(row[3])
 	status := strings.TrimSpace(row[4])
 
-	// Validate name
 	if name == "" {
 		return models.Product{}, fmt.Errorf("product name is required")
 	}
 
-	// Validate category
 	if category == "" {
 		return models.Product{}, fmt.Errorf("category is required")
 	}
 
-	// Validate price
 	price, err := strconv.ParseFloat(priceString, 64)
 
 	if err != nil || price < 0 {
 		return models.Product{}, fmt.Errorf("invalid price")
 	}
 
-	// Validate quantity
 	quantity, err := strconv.Atoi(quantityString)
 
 	if err != nil || quantity < 0 {
 		return models.Product{}, fmt.Errorf("invalid quantity")
 	}
 
-	// Validate status
 	if status != "active" && status != "inactive" {
 		return models.Product{}, fmt.Errorf(
 			"status must be active or inactive",

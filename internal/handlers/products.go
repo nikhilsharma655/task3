@@ -168,7 +168,6 @@ func GetProducts(c *gin.Context) {
 
 	query := database.DB.Model(&models.Product{})
 
-	// Filtering
 	if status != "" {
 		query = query.Where("status = ?", status)
 	}
@@ -177,7 +176,6 @@ func GetProducts(c *gin.Context) {
 		query = query.Where("category = ?", category)
 	}
 
-	// Count before pagination
 	var total int64
 
 	if err := query.Count(&total).Error; err != nil {
@@ -187,7 +185,6 @@ func GetProducts(c *gin.Context) {
 		return
 	}
 
-	// Sorting
 	allowedSorts := map[string]string{
 		"name":       "name",
 		"date":       "created_at",
@@ -203,7 +200,6 @@ func GetProducts(c *gin.Context) {
 
 	query = query.Order(sortColumn + " DESC")
 
-	// Pagination
 	offset := (page - 1) * limit
 
 	var products []models.Product

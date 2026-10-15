@@ -17,7 +17,6 @@ import (
 
 func UploadFile(c *gin.Context) {
 
-	// Get uploaded file
 	file, err := c.FormFile("file")
 
 	if err != nil {
@@ -27,7 +26,6 @@ func UploadFile(c *gin.Context) {
 		return
 	}
 
-	// Check file extension
 	extension := filepath.Ext(file.Filename)
 
 	if extension != ".csv" && extension != ".xlsx" {
@@ -37,10 +35,8 @@ func UploadFile(c *gin.Context) {
 		return
 	}
 
-	// Create unique job ID
 	jobID := uuid.New().String()
 
-	// Create uploads directory if it doesn't exist
 	err = os.MkdirAll("uploads", 0755)
 
 	if err != nil {
@@ -50,7 +46,6 @@ func UploadFile(c *gin.Context) {
 		return
 	}
 
-	// Create unique filename
 	fileName := fmt.Sprintf(
 		"%s_%d%s",
 		jobID,
@@ -60,7 +55,6 @@ func UploadFile(c *gin.Context) {
 
 	filePath := filepath.Join("uploads", fileName)
 
-	// Save uploaded file
 	err = c.SaveUploadedFile(file, filePath)
 
 	if err != nil {
@@ -70,7 +64,6 @@ func UploadFile(c *gin.Context) {
 		return
 	}
 
-	// Create import job
 	job := models.ImportJob{
 		ID:       jobID,
 		FileName: file.Filename,
@@ -88,7 +81,6 @@ func UploadFile(c *gin.Context) {
 		return
 	}
 
-	// Process file in background
 	go func() {
 
 		go func() {
@@ -103,7 +95,6 @@ func UploadFile(c *gin.Context) {
 
 	}()
 
-	// Return immediately
 	c.JSON(http.StatusAccepted, gin.H{
 		"message":   "file uploaded successfully",
 		"job_id":    jobID,

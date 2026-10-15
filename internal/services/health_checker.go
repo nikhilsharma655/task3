@@ -113,8 +113,6 @@ func checkOrphanProducts() {
 		return
 	}
 
-	// Products are currently standalone records,
-	// so an orphan check means checking for invalid records.
 	var invalidCount int
 
 	for _, product := range products {

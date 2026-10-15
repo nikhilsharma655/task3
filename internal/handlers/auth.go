@@ -49,12 +49,12 @@ func Register(c *gin.Context) {
 	request.Email = strings.ToLower(strings.TrimSpace(request.Email))
 	request.Role = strings.ToLower(strings.TrimSpace(request.Role))
 
-	// Default role
+	
 	if request.Role == "" {
 		request.Role = "viewer"
 	}
 
-	// Validate role
+	
 	if request.Role != "admin" &&
 		request.Role != "manager" &&
 		request.Role != "viewer" {
@@ -65,7 +65,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// Check existing user
+	
 	var existingUser models.User
 
 	err := database.DB.
@@ -79,7 +79,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// Hash password
+	
 	hashedPassword, err := bcrypt.GenerateFromPassword(
 		[]byte(request.Password),
 		bcrypt.DefaultCost,
@@ -130,7 +130,6 @@ func Login(c *gin.Context) {
 
 	request.Email = strings.ToLower(strings.TrimSpace(request.Email))
 
-	// Find user
 	var user models.User
 
 	err := database.DB.
@@ -144,7 +143,6 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// Check password
 	err = bcrypt.CompareHashAndPassword(
 		[]byte(user.Password),
 		[]byte(request.Password),
@@ -157,7 +155,6 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// Generate JWT
 	token, err := generateToken(user)
 
 	if err != nil {

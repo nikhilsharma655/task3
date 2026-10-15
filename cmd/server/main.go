@@ -14,10 +14,9 @@ import (
 
 func main() {
 
-	// Connect to database
 	database.ConnectDatabase()
 
-	// Create database tables
+	
 	if err := database.DB.AutoMigrate(
 		&models.Product{},
 		&models.ImportJob{},
@@ -27,36 +26,29 @@ func main() {
 		log.Fatal("Failed to migrate database:", err)
 	}
 
-	// Start background health-check scheduler
+	
 	services.StartHealthCheckScheduler()
 
-	// Create Gin router
+	
 	router := gin.Default()
 
-	// Health/test route
+	
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "Task 3 Go API is running",
 		})
 	})
 
-	// =========================
-	// Authentication Routes
-	// =========================
+	
 
 	router.POST("/api/auth/register", handlers.Register)
 	router.POST("/api/auth/login", handlers.Login)
 
-	// =========================
-	// File Import Routes
-	// =========================
+	
 
 	router.POST("/api/import", handlers.UploadFile)
 	router.GET("/api/import/:job_id", handlers.GetImportStatus)
 
-	// =========================
-	// Health Check Route
-	// =========================
 
 	router.GET(
 		"/api/health/check",
@@ -65,9 +57,7 @@ func main() {
 		handlers.RunHealthCheck,
 	)
 
-	// =========================
-	// Protected Test Route
-	// =========================
+	
 
 	router.GET(
 		"/api/protected",
@@ -82,11 +72,6 @@ func main() {
 		},
 	)
 
-	// =========================
-	// RBAC Test Routes
-	// =========================
-
-	// Admin-only route
 	router.GET(
 		"/api/admin",
 		middleware.AuthMiddleware(),
@@ -98,7 +83,7 @@ func main() {
 		},
 	)
 
-	// Admin and Manager route
+	
 	router.GET(
 		"/api/manager",
 		middleware.AuthMiddleware(),
@@ -110,7 +95,7 @@ func main() {
 		},
 	)
 
-	// Admin, Manager and Viewer route
+	
 	router.GET(
 		"/api/viewer",
 		middleware.AuthMiddleware(),
@@ -122,11 +107,6 @@ func main() {
 		},
 	)
 
-	// =========================
-	// Product Routes
-	// =========================
-
-	// Create product
 	router.POST(
 		"/api/products",
 		middleware.AuthMiddleware(),
@@ -134,8 +114,7 @@ func main() {
 		handlers.CreateProduct,
 	)
 
-	// Get products with pagination,
-	// filtering and sorting
+	
 	router.GET(
 		"/api/products",
 		middleware.AuthMiddleware(),
@@ -143,7 +122,6 @@ func main() {
 		handlers.GetProducts,
 	)
 
-	// Get single product
 	router.GET(
 		"/api/products/:id",
 		middleware.AuthMiddleware(),
@@ -151,7 +129,7 @@ func main() {
 		handlers.GetProduct,
 	)
 
-	// Update product
+	
 	router.PUT(
 		"/api/products/:id",
 		middleware.AuthMiddleware(),
@@ -159,7 +137,7 @@ func main() {
 		handlers.UpdateProduct,
 	)
 
-	// Delete product
+	
 	router.DELETE(
 		"/api/products/:id",
 		middleware.AuthMiddleware(),
@@ -167,9 +145,6 @@ func main() {
 		handlers.DeleteProduct,
 	)
 
-	// =========================
-	// Start Server
-	// =========================
 
 	log.Println("Server running on http://localhost:8080")
 
